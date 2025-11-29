@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Trash2, AlertCircle, X, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Trash2, AlertCircle, X } from 'lucide-react';
 
 interface Invoice {
   ref: string;
@@ -28,7 +28,7 @@ export function Financial() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await fetch('http://localhost:8000/invoices');
+      const response = await fetch('/api/invoices');
       const data = await response.json();
       setInvoices(data);
     } catch (error) {
@@ -49,7 +49,7 @@ export function Financial() {
 
     setCancelling(true);
     try {
-      const response = await fetch(`http://localhost:8000/invoices/${selectedInvoice.ref}`, {
+      const response = await fetch(`/api/invoices/${selectedInvoice.ref}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
