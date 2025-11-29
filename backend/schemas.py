@@ -67,3 +67,17 @@ class ManualInvoiceRecipient(BaseModel):
 class ManualInvoiceRequest(BaseModel):
     recipient: ManualInvoiceRecipient
     item: ManualInvoiceItem
+
+class UserBase(BaseModel):
+    username: str
+    full_name: Optional[str] = None
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+

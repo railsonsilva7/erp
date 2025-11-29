@@ -12,6 +12,10 @@ import { mockServiceOrders, mockClients, mockDevices } from './data/mockData'
 import type { ServiceOrder, Client, Device, ServiceOrderStatus, Sale } from './types'
 import './App.css'
 import { FilePlus, DollarSign } from 'lucide-react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import { Navigate, Outlet } from 'react-router-dom';
+
 
 const STORAGE_KEY = 'erp-service-orders';
 const SALES_STORAGE_KEY = 'erp-sales-history';
@@ -66,8 +70,23 @@ function ServiceOrdersPage({
   );
 }
 
+function PrivateRoute() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  }
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+}
+
 function Navigation() {
   const location = useLocation();
+
+  if (location.pathname === '/login') {
+    return null;
+  }
+
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -261,31 +280,38 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navigation />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ServiceOrdersPage
-              serviceOrders={serviceOrders}
-              clients={clients}
-              devices={devices}
-              isModalOpen={isModalOpen}
-              setIsModalOpen={setIsModalOpen}
-              handleCreateOrder={handleCreateOrder}
-              handleStatusChange={handleStatusChange}
+      <AuthProvider>
+        <Navigation />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          <Route element={<PrivateRoute />}>
+            <Route
+              path="/"
+              element={
+                <ServiceOrdersPage
+                  serviceOrders={serviceOrders}
+                  clients={clients}
+                  devices={devices}
+                  isModalOpen={isModalOpen}
+                  setIsModalOpen={setIsModalOpen}
+                  handleCreateOrder={handleCreateOrder}
+                  handleStatusChange={handleStatusChange}
+                />
+              }
             />
-          }
-        />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/pos" element={<POS onSaleComplete={addSale} />} />
-        <Route path="/sales" element={<SalesHistory sales={salesHistory} onUpdateStatus={updateSaleStatus} />} />
-        <Route path="/financial" element={<Financial />} />
-        <Route path="/manual-invoice" element={<ManualInvoice />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/pos" element={<POS onSaleComplete={addSale} />} />
+            <Route path="/sales" element={<SalesHistory sales={salesHistory} onUpdateStatus={updateSaleStatus} />} />
+            <Route path="/financial" element={<Financial />} />
+            <Route path="/manual-invoice" element={<ManualInvoice />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }
+
 
 export default App

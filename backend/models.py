@@ -56,3 +56,12 @@ class Invoice(Base):
     issued_at = Column(String) # Storing as ISO string for simplicity
     recipient_name = Column(String)
     total_value = Column(Float)
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    full_name = Column(String, nullable=True)
+
